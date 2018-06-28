@@ -1,4 +1,6 @@
+import os
 import tempfile
+import uuid
 from os import path
 import subprocess
 
@@ -126,17 +128,14 @@ def give_argument_names():
 #     return schema
 
 
-def write_observations(observation, target):
+def write_observations(observation, fn):
     srm_uris = observation.split('|')
-    fn = path.join(target, 'srm.txt')
-
     with open(fn, 'w') as f:
         for srm_uri in srm_uris:
             f.write(srm_uri + '\n')
 
 
-def write_config(config, target):
-    fn = path.join(target, 'master_setup.cfg')
+def write_config(config, fn):
     with open(fn, 'w') as f:
         f.write('''AVG_FREQ_STEP   = {avg_freq_step}
 AVG_TIME_STEP   = {avg_time_step}
@@ -149,19 +148,22 @@ PARSET		= {parset}
 '''.format(**config))
 
 
-def run(target):
-    stdoutfn = path.join(target, 'stdout.txt')
-    stderrfn = path.join(target, 'stderr.txt')
+def run(target, obs_fn, config_fn, job_id):
+    stdoutfn = path.join(target, 'stdout.' + job_id + '.txt')
+    stderrfn = path.join(target, 'stderr.' + job_id + '.txt')
     with open(stdoutfn, 'w') as stdout, open(stderrfn, 'w') as stderr:
-        subprocess.run(['LGPPP_LRT.py', 'srm.txt', 'master_setup.cfg'], cwd=target, stdout=stdout, stderr=stderr)
+        subprocess.run(['LGPPP_LRT.py', obs_fn, config_fn], cwd=target, stdout=stdout, stderr=stderr)
 
 
 def run_pipeline(observation, **config):
-    mydir = tempfile.mkdtemp()
+    pdir = os.environ['LGPPP_ROOT']
+    job_id = str(uuid.uuid4())
 
-    write_observations(observation, mydir)
-    write_config(config, mydir)
+    obs_fn = path.join(pdir, 'srm.' + job_id + '.txt')
+    write_observations(observation, obs_fn)
+    config_fn = path.join(pdir, 'master_setup.' + job_id + '.cfg')
+    write_config(config, config_fn)
 
-    run(mydir)
+    run(pdir, obs_fn, config_fn, job_id)
 
-    return mydir
+    return pdir + '-' + job_id
