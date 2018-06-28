@@ -6,7 +6,7 @@ Should be installed as dependency of https://github.com/EOSC-LOFAR/lofar_workflo
 
 To install as standalone
 ```
-pip install https://github.com/EOSC-LOFAR/LGPPP_LOFAR_pipeline.git#egg=LGPPP_LOFAR_pipeline
+pip install git+https://github.com/EOSC-LOFAR/LGPPP_LOFAR_pipeline.git#egg=LGPPP_LOFAR_pipeline
 ```
 
 # Run
