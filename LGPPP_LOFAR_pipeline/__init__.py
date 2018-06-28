@@ -40,7 +40,7 @@ def write_config(config, fn):
     with open(fn, 'w') as f:
         f.write('''AVG_FREQ_STEP   = {avg_freq_step}
 AVG_TIME_STEP   = {avg_time_step}
-DO_DEMIX        = {do_remix}
+DO_DEMIX        = {do_demix}
 DEMIX_FREQ_STEP = {demix_freq_step}
 DEMIX_TIME_STEP = {demix_time_step}
 DEMIX_SOURCES   = {demix_sources}
