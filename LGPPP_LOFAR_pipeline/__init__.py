@@ -151,8 +151,9 @@ PARSET		= {parset}
 def run(target, obs_fn, config_fn, job_id):
     stdoutfn = path.join(target, 'stdout.' + job_id + '.txt')
     stderrfn = path.join(target, 'stderr.' + job_id + '.txt')
+    cmdfn = path.join(target, 'LGPPP_LRT.py')
     with open(stdoutfn, 'w') as stdout, open(stderrfn, 'w') as stderr:
-        subprocess.run(['LGPPP_LRT.py', obs_fn, config_fn], cwd=target, stdout=stdout, stderr=stderr)
+        subprocess.run([cmdfn, obs_fn, config_fn], cwd=target, stdout=stdout, stderr=stderr)
 
 
 def run_pipeline(observation, **config):
@@ -166,4 +167,4 @@ def run_pipeline(observation, **config):
 
     run(pdir, obs_fn, config_fn, job_id)
 
-    return pdir + '-' + job_id
+    return 'Input and log files *.' + job_id + '.* in dir ' + pdir
