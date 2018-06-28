@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 import uuid
@@ -5,127 +6,27 @@ from os import path
 import subprocess
 
 def give_name():
-    return __name__
+    jsonfile = give_config()
+    name = list(jsonfile.keys())[0]
+    return name
 
 def give_version():
     return "0.0"
 
-def give_argument_names():
-    return {"avg_freq_step", 
-            "avg_time_step", 
-            "do_demix", 
-            "demix_freq_step", 
-            "demix_time_step", 
-            "demix_sources", 
-            "select_NL","parset"}
+def give_config():
+    json_config_file = os.path.join(os.path.dirname(__file__), "data", "config.json")
+    with open(json_config_file) as json_data:
+        return json.load(json_data)
 
-# def give_schema():
-#     schema = \
-#         {get_name():{
-#             "label": "LOFAR GRID Pre-Processing Pipeline",
-#             "schema": {
-#                 "type": "object",
-#                 "title": "Configuration Parameters:",
-#                 "description": "This is the LOFAR GRID Pre-Processing Pipeline. Here we print a description of the pipeline.",
-#                 "required": [
-#                   "avg_freq_step",
-#                   "avg_time_step",
-#                   "do_demix",
-#                   "demix_freq_step",
-#                   "demix_time_step",
-#                   "demix_sources",
-#                   "select_nl",
-#                   "parset"
-#                 ],
-#                 "properties": {
-#                   "avg_freq_step": {
-#                     "type": "integer",
-#                     "title": "avg_freq_step",
-#                     "description": "corresponds to .freqstep in NDPPP .type=average , or in case of .type=demixer it is the demixer.freqstep",
-#                     "default": 2,
-#                     "minimum": 0,
-#                     "exclusiveMinimum": true,
-#                     "maximum": 1000,
-#                     "exclusiveMaximum": true,    
-#                     "propertyOrder": 1
-#                   },
-#                   "avg_time_step": {
-#                     "type": "integer",
-#                     "title": "avg_time_step",
-#                     "description": "corresponds to .timestep in NDPPP .type=average , or in case of .type=demixer it is the demixer.timestep",
-#                     "default": 4,
-#                     "minimum": 0,
-#                     "exclusiveMinimum": true,
-#                     "maximum": 1000,
-#                     "exclusiveMaximum": true,    
-#                     "propertyOrder": 2
-#                   },
-#                   "do_demix": {
-#                     "type": "boolean",
-#                     "title": "do_demix",
-#                     "description": "if true then demixer instead of average is performed",
-#                     "default": true,
-#                     "propertyOrder": 3
-#                   },
-#                   "demix_freq_step": {
-#                     "type": "integer",
-#                     "title": "demix_freq_step",
-#                     "description": "corresponds to .demixfreqstep in NDPPP .type=demixer",
-#                     "default": 2,
-#                     "minimum": 0,
-#                     "exclusiveMinimum": true,
-#                     "maximum": 1000,
-#                     "exclusiveMaximum": true,    
-#                     "propertyOrder": 4
-#                   },
-#                   "demix_time_step": {
-#                     "type": "integer",
-#                     "title": "demix_time_step",
-#                     "description": "corresponds to .demixtimestep in NDPPP .type=demixer",
-#                     "default": 2,
-#                     "minimum": 0,
-#                     "exclusiveMinimum": true,
-#                     "maximum": 1000,
-#                     "exclusiveMaximum": true,    
-#                     "propertyOrder": 5
-#                   },
-#                   "demix_sources": {
-#                     "type": "string",
-#                     "description": "",
-#                     "title": "demix_sources",
-#                     "format": "select",
-#                     "enum": [
-#                       "CasA",
-#                       "CygA"
-#                     ],
-#                     "propertyOrder": 6
-#                   },
-#                   "select_nl": {
-#                     "type": "boolean",
-#                     "title": "select_nl",
-#                     "description": "if true then only Dutch stations are selected",
-#                     "default": true,
-#                     "propertyOrder": 7
-#                   },
-#                   "parset": {
-#                     "type": "string",
-#                     "title": "parset",
-#                     "description": "",
-#                     "format": "select",
-#                     "enum": [
-#                       "",
-#                       "hba_npp",
-#                       "hba_raw",
-#                       "lba_npp",
-#                       "lba_raw"
-#                     ],
-#                     "default": "lba_npp",
-#                     "propertyOrder": 8
-#                   }}
-#                 }
-#             }
-#         }
-#     return schema
+def give_argument_names(required=False):
+    jsonfile = give_config()
+    name = list(jsonfile.keys())[0]
+    required = jsonfile[name]["schema"]["required"]
+    properties = set(jsonfile[name]["schema"]["properties"].keys())
+    if required:
+        return required
+    else:
+        return properties
 
 
 def write_observations(observation, fn):

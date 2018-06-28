@@ -23,7 +23,7 @@ setup(name='LGPPP_LOFAR_pipeline',
       license='',
       packages=['LGPPP_LOFAR_pipeline'],
       # package_data={
-      #     'write_elan_eaf_files': ['main.py'],
+      #     'LGPPP_LOFAR_pipeline': ['data/*.json'],
       # },
       # install_requires=[
       #     'markdown',
@@ -33,5 +33,5 @@ setup(name='LGPPP_LOFAR_pipeline',
       # entry_points={
       #     'console_scripts': ['funniest-joke=funniest.command_line:main'],
       # },
-      #include_package_data=True,
+      include_package_data=True,
       zip_safe=True)
