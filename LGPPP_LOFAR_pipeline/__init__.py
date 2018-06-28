@@ -1,4 +1,6 @@
-
+import tempfile
+from os import path
+import subprocess
 
 def give_name():
     return __name__
@@ -123,10 +125,43 @@ def give_argument_names():
 #         }
 #     return schema
 
-def run_pipeline(observation, **kargs):
-    print("Running pipeline", give_name(), "version", give_version())
-    for k in kargs:
-        print("  ", k, ":", kargs[k])
 
-    response = "pipeline response LGPPP"
-    return response
+def write_observations(observation, target):
+    srm_uris = observation.split('|')
+    fn = path.join(target, 'srm.txt')
+
+    with open(fn, 'w') as f:
+        for srm_uri in srm_uris:
+            f.write(srm_uri + '\n')
+
+
+def write_config(config, target):
+    fn = path.join(target, 'master_setup.cfg')
+    with open(fn, 'w') as f:
+        f.write('''AVG_FREQ_STEP   = {avg_freq_step}
+AVG_TIME_STEP   = {avg_time_step}
+DO_DEMIX        = {do_remix}
+DEMIX_FREQ_STEP = {demix_freq_step}
+DEMIX_TIME_STEP = {demix_time_step}
+DEMIX_SOURCES   = {demix_sources}
+SELECT_NL       = {select_nl}
+PARSET		= {parset}
+'''.format(**config))
+
+
+def run(target):
+    stdoutfn = path.join(target, 'stdout.txt')
+    stderrfn = path.join(target, 'stderr.txt')
+    with open(stdoutfn, 'w') as stdout, open(stderrfn, 'w') as stderr:
+        subprocess.run(['LGPPP_LRT.py', 'srm.txt', 'master_setup.cfg'], cwd=target, stdout=stdout, stderr=stderr)
+
+
+def run_pipeline(observation, **config):
+    mydir = tempfile.mkdtemp()
+
+    write_observations(observation, mydir)
+    write_config(config, mydir)
+
+    run(mydir)
+
+    return mydir
